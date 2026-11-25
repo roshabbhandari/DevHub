@@ -23,16 +23,23 @@ DevHub is a responsive developer workspace for browser-local utilities. It is in
 - Local persistence for favorites and history
 - Accessible labels, keyboard-focusable controls, mobile layout, and empty/error states
 
-## Optional AdSense
+## Google AdSense
 
-Advertising is disabled unless real Google AdSense values are configured. Copy [.env.example](C:/Users/rosha/Desktop/web/.env.example) to `.env.local` and replace both values with the publisher client ID and ad slot ID issued by Google:
+The repository includes the AdSense publisher verification meta tag and the official AdSense loader in `index.html`. It also includes `public/ads.txt` for the configured publisher ID.
 
-```bash
-VITE_ADSENSE_CLIENT_ID=ca-pub-...
-VITE_ADSENSE_HEADER_SLOT=...
-```
+**Before ads can be served:**
 
-Never commit `.env.local`, use placeholder IDs in production, or load the script without valid consent/privacy configuration. The app does not block tools when ads are unavailable or blocked.
+1. Deploy the site on its final HTTPS domain and add that exact domain to the eligible AdSense account.
+2. Complete Google's site verification and review process. The code does not guarantee approval or immediate ad serving.
+3. For Auto ads, enable Auto ads for the site in the AdSense account after the site is approved.
+4. For the dashboard's manual ad placement, copy `.env.example` to `.env.local` and set a real ad-unit slot ID:
+   ```bash
+   VITE_ADSENSE_CLIENT_ID=ca-pub-1030876896435364
+   VITE_ADSENSE_HEADER_SLOT=YOUR_REAL_AD_UNIT_SLOT_ID
+   ```
+5. Set `VITE_SITE_URL` and `VITE_SUPPORT_EMAIL` to the real production values, then rebuild and redeploy.
+
+The publisher ID is a public identifier, not a secret. Never commit `.env.local` or credentials. The publisher account must belong to an eligible adult account holder. Review privacy/consent requirements for the countries where the site serves visitors before enabling ads. Never click your own ads or encourage visitors to click them.
 
 ## Routes
 
@@ -64,7 +71,7 @@ npm run test:e2e
 
 ## Scope and limitations
 
-This first production slice is client-only. There is no fake authentication, database, API proxy, cloud synchronization, AdSense publisher configuration, or server-side code execution. Those features require a backend/security review and deployment-specific credentials; they are not exposed as completed functionality.
+This first production slice is client-only. There is no fake authentication, database, API proxy, cloud synchronization, or server-side code execution. Those features require a backend/security review and deployment-specific credentials; they are not exposed as completed functionality.
 
 The playground executes only inside a sandboxed iframe. Tool data is not uploaded by the app. Clipboard actions require browser permission and HTTPS (or localhost).
 
@@ -82,7 +89,7 @@ The playground executes only inside a sandboxed iframe. Tool data is not uploade
 
 ### Netlify deployment
 
-Netlify is the selected provider because this is a static Vite SPA and [public/_redirects](C:/Users/rosha/Desktop/web/public/_redirects) already provides the SPA fallback.
+Netlify is the selected provider because this is a static Vite SPA and `public/_redirects` already provides the SPA fallback.
 
 ```bash
 npm run build
@@ -91,6 +98,6 @@ netlify login
 netlify deploy --dir=dist --prod
 ```
 
-The deployment command will print the real generated URL. No deployment was claimed from this environment because no Netlify CLI or authenticated provider session was available.
+The deployment command will print the real generated URL. Configure the same URL as `VITE_SITE_URL` in Netlify's environment variables and rebuild after changing it.
 
 Deploy the Vite `dist` output to a static host. Configure SPA fallback to `index.html` so direct tool URLs resolve to the application entry point. Before adding account or API proxy features, introduce server-side validation, authentication, rate limiting, SSRF protection, and a database migration strategy.
