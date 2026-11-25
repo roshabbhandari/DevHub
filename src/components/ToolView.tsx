@@ -16,7 +16,7 @@ import { formatSql } from '../tools/sql'
 import { explainCron, nextCronRuns } from '../tools/cron'
 
 export function ToolView({ tool, onBack }: { tool: Tool; onBack: () => void }) {
-  let editor: React.ReactNode
+  let editor: React.ReactNode = null
 
   switch (tool.id) {
     case 'json': editor = <JsonTool />; break
@@ -76,7 +76,47 @@ features:
   - testing`); const [mode, setMode] = useState<'yaml' | 'json'>('yaml'); let output = ''; try { output = mode === 'yaml' ? yamlToJson(input) : jsonToYaml(input) } catch (error) { output = `Error: ${error instanceof Error ? error.message : 'Invalid YAML'}` }; return <><div className="tool-options"><button className={mode === 'yaml' ? 'selected' : ''} onClick={() => setMode('yaml')}>YAML → JSON</button><button className={mode === 'json' ? 'selected' : ''} onClick={() => setMode('json')}>JSON → YAML</button></div><ToolShell output={output} onReset={() => setInput('')} onCopy={() => navigator.clipboard.writeText(output)} onDownload={() => downloadText(mode === 'yaml' ? 'converted.json' : 'converted.yaml', output)}><textarea value={input} onChange={(event) => setInput(event.target.value)} aria-label="YAML or JSON input" /></ToolShell></> }
 function ColorTool() { const [input, setInput] = useState('#67e8c0'); let output = ''; try { const rgb = hexToRgb(input); output = JSON.stringify({ hex: rgbToHex(rgb), rgb, hsl: rgbToHsl(rgb), contrastOnWhite: contrastRatio(rgb, { r: 255, g: 255, b: 255 }), contrastOnBlack: contrastRatio(rgb, { r: 0, g: 0, b: 0 }) }, null, 2) } catch (error) { output = `Error: ${error instanceof Error ? error.message : 'Invalid color'}` }; return <ToolShell output={output} onReset={() => setInput('')} onCopy={() => navigator.clipboard.writeText(output)}><div><input className="color-input" type="color" value={input.startsWith('#') && input.length === 7 ? input : '#000000'} onChange={(event) => setInput(event.target.value)} aria-label="Color picker" /><input value={input} onChange={(event) => setInput(event.target.value)} placeholder="#67e8c0" aria-label="Hex color" /></div></ToolShell> }
 function XmlTool() { const [input, setInput] = useState('<root><item id="1">DevHub</item></root>'); let output = ''; try { output = formatXml(input) } catch (error) { output = `Error: ${error instanceof Error ? error.message : 'Invalid XML'}` }; return <ToolShell output={output} onReset={() => setInput('')} onCopy={() => navigator.clipboard.writeText(output)} onDownload={() => downloadText('formatted.xml', output, 'application/xml')}><textarea value={input} onChange={(event) => setInput(event.target.value)} aria-label="XML input" /></ToolShell> }
-function MarkdownTool() { const [input, setInput] = useState('# DevHub\n\nBuild focused developer tools.'); let output = ''; try { output = markdownToHtml(input) } catch (error) { output = `Error: ${error instanceof Error ? error.message : 'Invalid Markdown'}` }; return <div className="markdown-tool"><div className="editor-panel"><div className="panel-head"><span>MARKDOWN</span><button onClick={() => setInput('')}>Reset</button></div><textarea value={input} onChange={(event) => setInput(event.target.value)} aria-label="Markdown input" /></div><div className="markdown-preview" dangerouslySetInnerHTML={{ __html: output }} /></div> }
+function MarkdownTool() {
+  const [input, setInput] = useState('# DevHub\\n\\nBuild focused developer tools.')
+  let output = ''
+  try {
+    output = markdownToHtml(input)
+  } catch (error) {
+    output = `<p>${error instanceof Error ? error.message : 'Invalid Markdown'}</p>`
+  }
+
+  const previewDocument = `<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta http-equiv="Content-Security-Policy" content="default-src 'none'; img-src data:; style-src 'unsafe-inline'; base-uri 'none'; form-action 'none'">
+<style>
+body{font:15px/1.65 system-ui,sans-serif;color:#182131;padding:18px;overflow-wrap:anywhere}
+pre,code{font-family:ui-monospace,monospace;background:#eef2f7;border-radius:4px}
+code{padding:2px 4px}pre{padding:12px;overflow:auto}blockquote{border-left:3px solid #9aa8ba;padding-left:12px;color:#536176}
+img{max-width:100%}table{border-collapse:collapse}td,th{border:1px solid #cbd5e1;padding:6px}
+</style>
+</head>
+<body>${output}</body>
+</html>`
+
+  return (
+    <div className="markdown-tool">
+      <div className="editor-panel">
+        <div className="panel-head"><span>MARKDOWN</span><button onClick={() => setInput('')}>Reset</button></div>
+        <textarea value={input} onChange={(event) => setInput(event.target.value)} aria-label="Markdown input" />
+      </div>
+      <iframe
+        className="markdown-preview"
+        title="Sandboxed Markdown preview"
+        sandbox=""
+        referrerPolicy="no-referrer"
+        srcDoc={previewDocument}
+      />
+    </div>
+  )
+}
 function SqlTool() { const [input, setInput] = useState('select id, name from users where active = true order by name;'); let output = ''; try { output = formatSql(input) } catch (error) { output = `Error: ${error instanceof Error ? error.message : 'Invalid SQL'}` }; return <ToolShell output={output} onReset={() => setInput('')} onCopy={() => navigator.clipboard.writeText(output)} onDownload={() => downloadText('formatted.sql', output)}><textarea value={input} onChange={(event) => setInput(event.target.value)} aria-label="SQL input" /></ToolShell> }
 function HttpStatusTool() { const statuses = [{ code: 200, label: 'OK', detail: 'The request succeeded.' }, { code: 201, label: 'Created', detail: 'A resource was created.' }, { code: 301, label: 'Moved Permanently', detail: 'The resource has a new permanent URL.' }, { code: 400, label: 'Bad Request', detail: 'The server could not understand the request.' }, { code: 401, label: 'Unauthorized', detail: 'Authentication is required.' }, { code: 403, label: 'Forbidden', detail: 'The server refuses to authorize the request.' }, { code: 404, label: 'Not Found', detail: 'The requested resource does not exist.' }, { code: 429, label: 'Too Many Requests', detail: 'Rate limiting is active.' }, { code: 500, label: 'Internal Server Error', detail: 'The server encountered an unexpected condition.' }]; const [query, setQuery] = useState(''); const filtered = statuses.filter((status) => `${status.code} ${status.label} ${status.detail}`.toLowerCase().includes(query.toLowerCase())); return <div className="reference-tool"><input value={query} onChange={(event) => setQuery(event.target.value)} placeholder="Search status codes..." aria-label="Search HTTP statuses" />{filtered.map((status) => <div className="reference-row" key={status.code}><strong>{status.code}</strong><span><b>{status.label}</b><small>{status.detail}</small></span></div>)}</div> }
 function CronTool() { const [input, setInput] = useState('*/15 * * * *'); let output = ''; try { output = `Schedule\n${explainCron(input)}\n\nNext runs\n${nextCronRuns(input).join('\n')}` } catch (error) { output = `Error: ${error instanceof Error ? error.message : 'Invalid cron expression'}` }; return <ToolShell output={output} onReset={() => setInput('')} onCopy={() => navigator.clipboard.writeText(output)}><textarea value={input} onChange={(event) => setInput(event.target.value)} aria-label="Cron expression" /></ToolShell> }
