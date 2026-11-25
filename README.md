@@ -1,58 +1,67 @@
 # DevHub
 
-DevHub is a responsive developer workspace for browser-local utilities. It is intentionally useful without an account: tool input, favorites, recent tools, and theme preferences remain in the current browser's local storage.
+DevHub is a responsive browser-based workspace of developer utilities. It is intended to be useful without a DevHub account: ordinary tool inputs are processed by client-side code, while theme, favorite tool IDs, and recent tool IDs are stored in the current browser.
 
-## Implemented
+## Tools
 
-- Dashboard with search, categories, quick access, favorites, recent activity, and responsive navigation
-- JSON formatter/validator/minifier
-- UTF-8 Base64 encoder/decoder
-- Regular expression tester
-- Text case converter and word/character counts
-- URL component encoder/decoder
-- Cryptographically random UUID generator
-- Web Crypto SHA-256, SHA-384, and SHA-512 hashing
-- Sandboxed HTML/CSS/JavaScript live playground
-- CSV ↔ JSON conversion with quoted-field parsing and custom delimiters
-- Unix timestamp and ISO date conversion with UTC/local displays
-- YAML validation/formatting and JSON conversion
-- HEX/RGB/HSL color conversion and WCAG contrast ratios
-- XML formatter/validator, Markdown preview, SQL formatter
-- HTTP status reference and cron schedule toolkit
-- Dark/light theme preference
-- Local persistence for favorites and history
-- Accessible labels, keyboard-focusable controls, mobile layout, and empty/error states
+DevHub currently includes 17 tools across six categories:
+
+- **Code engineering:** JSON formatter and validator, Base64 encoder/decoder, regular-expression tester, text case toolkit, XML formatter, Markdown preview, and SQL formatter
+- **Web development:** HTML/CSS/JavaScript playground and color converter with RGB/HSL and black/white contrast calculations
+- **API workspace:** URL component encoder/decoder and HTTP status reference
+- **Data utilities:** CSV ↔ JSON converter and Unix timestamp/date converter
+- **Security utilities:** UUID v4 generator and SHA-256/SHA-384/SHA-512 digest generator
+- **DevOps toolkit:** YAML validator/converter and cron expression explainer with upcoming run previews
+
+Every tool page includes instructions, examples, and a note about limitations. The app also includes search, categories, favorites, recent tools, dark/light theme, and About, Contact, Privacy, Terms, Disclaimer, and Cookies & Advertising pages.
+
+## How processing and storage work
+
+The ordinary formatting, conversion, hashing, and reference utilities run in the visitor's browser. DevHub does not submit ordinary tool inputs to a DevHub application API. The Web Playground uses a sandboxed iframe, and the Markdown preview is also isolated in a sandboxed iframe.
+
+The app stores theme preference, favorite tool IDs, and recent tool IDs in browser localStorage. These values are local to the current browser and are not synchronized to a DevHub account. Browser requests, hosting logs, Google advertising scripts, and external browser services have separate data practices. Visitors should not paste secrets or sensitive personal information into public web tools.
 
 ## Google AdSense
 
-The repository includes the AdSense publisher verification meta tag and the official AdSense loader in `index.html`. It also includes `public/ads.txt` for the configured publisher ID.
+The repository includes the publisher verification meta tag and the official AdSense loader in `index.html`, the Funding Choices script, and the authorized-seller declaration in `public/ads.txt`.
 
-**Before ads can be served:**
+The AdSense publisher ID in this repository is a public integration identifier. Confirm that it belongs to the eligible adult account holder who owns the AdSense account before publishing the site.
 
-1. Deploy the site on its final HTTPS domain and add that exact domain to the eligible AdSense account.
-2. Complete Google's site verification and review process. The code does not guarantee approval or immediate ad serving.
-3. For Auto ads, enable Auto ads for the site in the AdSense account after the site is approved.
-4. For the dashboard's manual ad placement, copy `.env.example` to `.env.local` and set a real ad-unit slot ID:
-   ```bash
-   VITE_ADSENSE_CLIENT_ID=ca-pub-1030876896435364
-   VITE_ADSENSE_HEADER_SLOT=YOUR_REAL_AD_UNIT_SLOT_ID
-   ```
-5. Set `VITE_SITE_URL` and `VITE_SUPPORT_EMAIL` to the real production values, then rebuild and redeploy.
+**These code files do not guarantee approval or start ads by themselves.** Before ads can be served:
 
-The publisher ID is a public identifier, not a secret. Never commit `.env.local` or credentials. The publisher account must belong to an eligible adult account holder. Review privacy/consent requirements for the countries where the site serves visitors before enabling ads. Never click your own ads or encourage visitors to click them.
+1. Deploy the latest `main` branch to the final HTTPS domain.
+2. Add that exact production domain to the eligible AdSense account and complete Google's site review.
+3. Confirm that `https://dev-hub-nu-nine.vercel.app/ads.txt` returns the publisher line from `public/ads.txt`.
+4. Configure and publish appropriate consent messages under AdSense **Privacy & messaging**. The Funding Choices script alone does not create or publish a message.
+5. After the site is approved, enable Auto ads in the AdSense account, or set a real ad-unit slot ID for the dashboard's manual placement.
 
-## Routes
+For the dashboard's manual ad unit, configure these Vercel project environment variables, then redeploy:
 
-Tool pages are real browser routes and support direct navigation and refresh:
+```env
+VITE_ADSENSE_CLIENT_ID=ca-pub-1030876896435364
+VITE_ADSENSE_HEADER_SLOT=YOUR_REAL_AD_UNIT_SLOT_ID
+VITE_SITE_URL=https://dev-hub-nu-nine.vercel.app
+VITE_SUPPORT_EMAIL=YOUR_MONITORED_SUPPORT_EMAIL
+```
+
+If using Auto ads only, the manual slot variable can remain empty. Never commit `.env.local`, account passwords, or private credentials. AdSense requirements and regional consent rules can change; review the current Google guidance before enabling ads. Never click your own ads or encourage visitors to click them.
+
+## Public routes
+
+Tool routes:
 
 `/tools/json-formatter`, `/tools/base64`, `/tools/regex-tester`, `/tools/text-toolkit`, `/tools/url-encoder`, `/tools/uuid-generator`, `/tools/hash-generator`, `/tools/code-playground`, `/tools/csv-json`, `/tools/timestamp-converter`, `/tools/yaml-validator`, `/tools/color-converter`, `/tools/xml-formatter`, `/tools/markdown`, `/tools/sql-formatter`, `/tools/http-status`, and `/tools/cron`.
 
-The workspace pages are `/`, `/favorites`, `/history`, and `/settings`. Unknown paths show a 404 state.
+Information pages: `/about`, `/contact`, `/privacy`, `/terms`, `/disclaimer`, and `/cookies`.
 
-## Run locally
+Private browser workspace pages such as favorites, history, and settings are marked noindex and excluded from the sitemap.
+
+## Local development
+
+Requirements: Node.js 22 or newer and npm.
 
 ```bash
-npm install
+npm ci
 npm run dev
 ```
 
@@ -60,44 +69,39 @@ Validation commands:
 
 ```bash
 npm run lint
-npm run build
-npm run preview
 npm run typecheck
 npm run test
+npm run build
+npm run preview
 npm run test:e2e
 ```
 
-`npm run test:e2e` starts the production preview automatically. Install the browser once with `npx playwright install chromium`.
+Install Playwright Chromium once before running end-to-end tests:
+
+```bash
+npx playwright install chromium
+```
+
+GitHub Actions runs lint, type-checking, unit tests, a production build, and Playwright end-to-end tests on pushes and pull requests to `main`.
+
+## Deploy to Vercel
+
+This repository is configured as a Vite static site.
+
+- Framework preset: **Vite**
+- Build command: `npm run build`
+- Output directory: `dist`
+- Install command: `npm ci`
+- Production branch: `main`
+
+Connect the GitHub repository to Vercel, configure the environment variables above in the Vercel project settings, and deploy the latest `main` commit. After deployment, check these public files:
+
+- `/ads.txt`
+- `/robots.txt`
+- `/sitemap.xml`
+
+The sitemap and canonical URL currently use `https://dev-hub-nu-nine.vercel.app`. If the production domain changes, update the canonical/social URLs in `index.html`, the `siteOrigin` constant in `src/App.tsx`, `public/robots.txt`, and `public/sitemap.xml`, then redeploy.
 
 ## Scope and limitations
 
-This first production slice is client-only. There is no fake authentication, database, API proxy, cloud synchronization, or server-side code execution. Those features require a backend/security review and deployment-specific credentials; they are not exposed as completed functionality.
-
-The playground executes only inside a sandboxed iframe. Tool data is not uploaded by the app. Clipboard actions require browser permission and HTTPS (or localhost).
-
-## Architecture
-
-- React 19 + TypeScript
-- Vite
-- Plain CSS design system with dark/light theme variables
-- History API routing with refresh-safe Vite fallback
-- Web Crypto API for hashing and UUID generation
-- `yaml` parser for YAML conversion and validation
-- `localStorage` for non-sensitive workspace preferences
-
-## Production notes
-
-### Netlify deployment
-
-Netlify is the selected provider because this is a static Vite SPA and `public/_redirects` already provides the SPA fallback.
-
-```bash
-npm run build
-npm install -g netlify-cli
-netlify login
-netlify deploy --dir=dist --prod
-```
-
-The deployment command will print the real generated URL. Configure the same URL as `VITE_SITE_URL` in Netlify's environment variables and rebuild after changing it.
-
-Deploy the Vite `dist` output to a static host. Configure SPA fallback to `index.html` so direct tool URLs resolve to the application entry point. Before adding account or API proxy features, introduce server-side validation, authentication, rate limiting, SSRF protection, and a database migration strategy.
+DevHub is currently a client-side tool collection. It does not provide a database, user accounts, cloud synchronization, a server-side code execution environment, database connectivity, project hosting, or production security certification. Formatting and conversion tools do not guarantee that output is correct or safe for every platform. Test important output in its target environment.
