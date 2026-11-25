@@ -1,8 +1,27 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
-  <url><loc>/</loc></url>
-  <url><loc>/tools/json-formatter</loc></url>
-  <url><loc>/tools/csv-json</loc></url>
-  <url><loc>/tools/yaml-validator</loc></url>
-  <url><loc>/tools/color-converter</loc></url>
+  <url><loc>https://dev-hub-nu-nine.vercel.app/</loc></url>
+  <url><loc>https://dev-hub-nu-nine.vercel.app/tools/json-formatter</loc></url>
+  <url><loc>https://dev-hub-nu-nine.vercel.app/tools/base64</loc></url>
+  <url><loc>https://dev-hub-nu-nine.vercel.app/tools/regex-tester</loc></url>
+  <url><loc>https://dev-hub-nu-nine.vercel.app/tools/text-toolkit</loc></url>
+  <url><loc>https://dev-hub-nu-nine.vercel.app/tools/url-encoder</loc></url>
+  <url><loc>https://dev-hub-nu-nine.vercel.app/tools/uuid-generator</loc></url>
+  <url><loc>https://dev-hub-nu-nine.vercel.app/tools/hash-generator</loc></url>
+  <url><loc>https://dev-hub-nu-nine.vercel.app/tools/code-playground</loc></url>
+  <url><loc>https://dev-hub-nu-nine.vercel.app/tools/csv-json</loc></url>
+  <url><loc>https://dev-hub-nu-nine.vercel.app/tools/timestamp-converter</loc></url>
+  <url><loc>https://dev-hub-nu-nine.vercel.app/tools/yaml-validator</loc></url>
+  <url><loc>https://dev-hub-nu-nine.vercel.app/tools/color-converter</loc></url>
+  <url><loc>https://dev-hub-nu-nine.vercel.app/tools/xml-formatter</loc></url>
+  <url><loc>https://dev-hub-nu-nine.vercel.app/tools/markdown</loc></url>
+  <url><loc>https://dev-hub-nu-nine.vercel.app/tools/sql-formatter</loc></url>
+  <url><loc>https://dev-hub-nu-nine.vercel.app/tools/http-status</loc></url>
+  <url><loc>https://dev-hub-nu-nine.vercel.app/tools/cron</loc></url>
+  <url><loc>https://dev-hub-nu-nine.vercel.app/about</loc></url>
+  <url><loc>https://dev-hub-nu-nine.vercel.app/contact</loc></url>
+  <url><loc>https://dev-hub-nu-nine.vercel.app/privacy</loc></url>
+  <url><loc>https://dev-hub-nu-nine.vercel.app/terms</loc></url>
+  <url><loc>https://dev-hub-nu-nine.vercel.app/disclaimer</loc></url>
+  <url><loc>https://dev-hub-nu-nine.vercel.app/cookies</loc></url>
 </urlset>
