@@ -1,4 +1,5 @@
 import { useState } from 'react'
+import { ToolGuide } from './ToolGuide'
 import type { Tool } from '../types/tools'
 import { encodeBase64, decodeBase64, encodeUrl, decodeUrl } from '../tools/encoding'
 import { formatJson } from '../tools/json'
@@ -15,7 +16,43 @@ import { formatSql } from '../tools/sql'
 import { explainCron, nextCronRuns } from '../tools/cron'
 
 export function ToolView({ tool, onBack }: { tool: Tool; onBack: () => void }) {
-  return <div className="tool-page"><button className="back-button" onClick={onBack}>← Back to workspace</button><div className="tool-title"><span className="tool-icon large">{tool.icon}</span><div><p className="eyebrow">{tool.category}</p><h1>{tool.name}</h1><p className="subtitle">{tool.description}</p></div></div>{tool.id === 'json' ? <JsonTool /> : tool.id === 'base64' ? <Base64Tool /> : tool.id === 'regex' ? <RegexTool /> : tool.id === 'text' ? <TextTool /> : tool.id === 'url' ? <UrlTool /> : tool.id === 'uuid' ? <UuidTool /> : tool.id === 'hash' ? <HashTool /> : tool.id === 'playground' ? <Playground /> : tool.id === 'csv-json' ? <CsvTool /> : tool.id === 'timestamp' ? <TimestampTool /> : tool.id === 'yaml' ? <YamlTool /> : tool.id === 'color' ? <ColorTool /> : tool.id === 'xml' ? <XmlTool /> : tool.id === 'markdown' ? <MarkdownTool /> : tool.id === 'sql' ? <SqlTool /> : tool.id === 'http-status' ? <HttpStatusTool /> : <CronTool />}</div>
+  let editor: React.ReactNode
+
+  switch (tool.id) {
+    case 'json': editor = <JsonTool />; break
+    case 'base64': editor = <Base64Tool />; break
+    case 'regex': editor = <RegexTool />; break
+    case 'text': editor = <TextTool />; break
+    case 'url': editor = <UrlTool />; break
+    case 'uuid': editor = <UuidTool />; break
+    case 'hash': editor = <HashTool />; break
+    case 'playground': editor = <Playground />; break
+    case 'csv-json': editor = <CsvTool />; break
+    case 'timestamp': editor = <TimestampTool />; break
+    case 'yaml': editor = <YamlTool />; break
+    case 'color': editor = <ColorTool />; break
+    case 'xml': editor = <XmlTool />; break
+    case 'markdown': editor = <MarkdownTool />; break
+    case 'sql': editor = <SqlTool />; break
+    case 'http-status': editor = <HttpStatusTool />; break
+    case 'cron': editor = <CronTool />; break
+  }
+
+  return (
+    <div className="tool-page">
+      <button className="back-button" onClick={onBack}>← Back to workspace</button>
+      <div className="tool-title">
+        <span className="tool-icon large">{tool.icon}</span>
+        <div>
+          <p className="eyebrow">{tool.category}</p>
+          <h1>{tool.name}</h1>
+          <p className="subtitle">{tool.description}</p>
+        </div>
+      </div>
+      {editor}
+      <ToolGuide toolId={tool.id} />
+    </div>
+  )
 }
 
 function ToolShell({ children, onReset, onCopy, onDownload, output }: { children: React.ReactNode; onReset: () => void; onCopy: () => void; onDownload?: () => void; output: string }) {
