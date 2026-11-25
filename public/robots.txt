@@ -1,4 +1,7 @@
 User-agent: *
 Allow: /
+Disallow: /favorites
+Disallow: /history
+Disallow: /settings
 
-Sitemap: /sitemap.xml
+Sitemap: https://dev-hub-nu-nine.vercel.app/sitemap.xml
