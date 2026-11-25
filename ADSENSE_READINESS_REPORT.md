@@ -1,21 +1,23 @@
 # DevHub AdSense Readiness Report
 
-This report describes the current implementation only. Google makes the final AdSense decision independently; this project does not claim approval.
+This report describes the current repository implementation only. Google makes the final AdSense decision independently; this project does not claim approval or guaranteed ad serving.
 
 ## Status summary
 
 | Area | Status | Notes |
 | --- | --- | --- |
 | Original tool functionality | IMPLEMENTED | Browser-local developer utilities with validation and error states. |
-| Core tool tests | VERIFIED | Unit and Playwright suites execute successfully. |
+| Core tool tests | PREVIOUSLY VERIFIED | Existing report records successful unit and Playwright runs; rerun after these changes and before launch. |
 | Essential pages | IMPLEMENTED | About, Contact, Privacy, Terms, Disclaimer, and Cookies & advertising pages are routed and linked in the footer. |
-| Privacy accuracy | NEEDS OWNER INPUT | Confirm the hosting provider, production domain, support address, analytics choice, and applicable jurisdictional consent requirements. |
-| Advertising configuration | IMPLEMENTED | Optional AdSense component and environment configuration exist; ads remain disabled without real IDs. |
-| Publisher configuration | NEEDS OWNER INPUT | Set `VITE_ADSENSE_CLIENT_ID` and real slot IDs only after the AdSense account and site review process are ready. |
-| Production domain | NEEDS OWNER INPUT | Set `VITE_SITE_URL` and replace relative canonical/OG values when the real domain is known. |
+| AdSense verification | IMPLEMENTED | Publisher meta tag and official loader script are included in `index.html`. |
+| ads.txt | IMPLEMENTED | `public/ads.txt` contains the publisher declaration supplied for this site. Verify that it matches the actual account owner. |
+| Auto ads | ACCOUNT ACTION REQUIRED | The site owner must enable Auto ads in the eligible AdSense account after site review/approval. |
+| Manual ad placement | NEEDS OWNER INPUT | Set a real `VITE_ADSENSE_HEADER_SLOT` if using the dashboard AdSlot placement. |
+| Privacy and consent | NEEDS OWNER INPUT | Confirm hosting, production domain, support address, analytics choice, and applicable consent requirements. |
+| Production domain | NEEDS OWNER INPUT | Set `VITE_SITE_URL` and configure the final canonical/metadata URLs once the production domain is known. |
 | Support contact | NEEDS OWNER INPUT | Set `VITE_SUPPORT_EMAIL` to a monitored address. |
-| Deployment | BLOCKED | No authenticated hosting CLI was available in the development environment. |
-| Accessibility audit | NEEDS TESTING | Playwright mobile navigation coverage exists; Lighthouse/axe results have not been generated. |
+| Deployment | NOT VERIFIED | Deploy the current main branch to the final HTTPS domain and test it. |
+| Accessibility audit | NEEDS TESTING | Lighthouse/axe results have not been generated. |
 
 ## Content and navigation audit
 
@@ -31,19 +33,17 @@ If AdSense is enabled, Google may process information through its advertising te
 
 ## Advertisement audit
 
-The reusable [`AdSlot`](C:/Users/rosha/Desktop/web/src/components/AdSlot.tsx) component:
-
-- Loads the official script only when a real client ID and slot are configured.
-- Renders no fake ad when configuration is absent.
-- Does not encourage clicks or manipulate impressions.
-- Reserves layout space and does not overlap tool controls.
-- Fails open for the application: tools remain usable when ads are blocked or unavailable.
-
-No publisher ID, slot ID, ads.txt publisher line, analytics identifier, or approval claim is committed.
+- The AdSense publisher verification meta tag is present in `index.html`.
+- The official AdSense loader is present in `index.html` and is marked so the React component can detect the existing script.
+- `public/ads.txt` contains the supplied authorized-seller line.
+- The reusable `AdSlot` component renders the dashboard's manual ad unit only when both a publisher client ID and a real slot ID are configured.
+- Auto ads still need to be enabled in the AdSense account; loading the script alone does not cause Google to serve ads.
+- The site must complete Google's review and comply with applicable policies before ads are served.
+- The app does not encourage clicks or manipulate impressions, and tools remain usable when ads are unavailable or blocked.
 
 ## Technical verification
 
-Verified commands in the current workspace:
+Rerun these commands against the updated main branch before deployment:
 
 ```text
 npm run typecheck
@@ -54,18 +54,16 @@ npm run test:e2e
 npm audit --audit-level=high
 ```
 
-The production build and automated tests must be rerun after owner configuration changes. Bundle-size warnings should be reviewed before launch.
+## Remaining launch tasks
 
-## Remaining policy and launch risks
+1. Confirm the publisher ID belongs to the eligible adult account holder who owns the AdSense account.
+2. Deploy to the final HTTPS domain and add that exact site in AdSense.
+3. Verify that `https://YOUR-DOMAIN/ads.txt` serves the expected line and that the verification meta tag is present in the live page source.
+4. Complete Google's site review. After approval, enable Auto ads or configure valid manual ad-unit slots.
+5. Configure a real support email, production site URL, and any required consent management.
+6. Run the technical checks and Lighthouse/axe accessibility audit.
 
-1. Owner must provide the real production domain and monitored support email.
-2. Owner must complete any required privacy/consent configuration before enabling personalized advertising.
-3. Owner must review Google's current Publisher Policies before submission.
-4. Lighthouse and axe accessibility reports are still needed.
-5. A real hosting deployment and HTTPS smoke test are still needed.
-6. The owner should add an `ads.txt` entry only using the real publisher details supplied by AdSense.
-
-## Official references consulted
+## Official references
 
 - [AdSense eligibility requirements](https://support.google.com/adsense/answer/9724)
 - [Pages ready for AdSense](https://support.google.com/adsense/answer/7299563)
