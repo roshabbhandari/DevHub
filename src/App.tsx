@@ -97,7 +97,7 @@ function App() {
     setMeta('property', 'og:url', canonical)
     setMeta('name', 'twitter:title', title)
     setMeta('name', 'twitter:description', description)
-  }, [activeTool?.id, route])
+  }, [activeTool?.name, activeTool?.description, route])
   const visibleTools = useMemo(() => tools.filter((tool) => {
     const matchesSearch = `${tool.name} ${tool.description} ${tool.category}`.toLowerCase().includes(query.toLowerCase())
     const matchesCategory = !activeCategory || tool.category === activeCategory
@@ -140,7 +140,7 @@ function Dashboard({ tools: visibleTools, recent, favorites, onOpen, onFavorite,
       {pageMode === 'dashboard' ? (
         <section className="welcome">
           <div>
-            <p className="eyebrow">{new Date().toLocaleDateString(undefined, { weekday: 'long', month: 'long', day: 'numeric', year: 'numeric' })}</p>
+            <p className="eyebrow">YOUR DEVELOPER WORKSPACE</p>
             <h1>Welcome to DevHub <span>✦</span></h1>
             <p className="subtitle">A practical workspace for everyday development tasks.</p>
           </div>
