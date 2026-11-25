@@ -118,5 +118,35 @@ img{max-width:100%}table{border-collapse:collapse}td,th{border:1px solid #cbd5e1
   )
 }
 function SqlTool() { const [input, setInput] = useState('select id, name from users where active = true order by name;'); let output = ''; try { output = formatSql(input) } catch (error) { output = `Error: ${error instanceof Error ? error.message : 'Invalid SQL'}` }; return <ToolShell output={output} onReset={() => setInput('')} onCopy={() => navigator.clipboard.writeText(output)} onDownload={() => downloadText('formatted.sql', output)}><textarea value={input} onChange={(event) => setInput(event.target.value)} aria-label="SQL input" /></ToolShell> }
-function HttpStatusTool() { const statuses = [{ code: 200, label: 'OK', detail: 'The request succeeded.' }, { code: 201, label: 'Created', detail: 'A resource was created.' }, { code: 301, label: 'Moved Permanently', detail: 'The resource has a new permanent URL.' }, { code: 400, label: 'Bad Request', detail: 'The server could not understand the request.' }, { code: 401, label: 'Unauthorized', detail: 'Authentication is required.' }, { code: 403, label: 'Forbidden', detail: 'The server refuses to authorize the request.' }, { code: 404, label: 'Not Found', detail: 'The requested resource does not exist.' }, { code: 429, label: 'Too Many Requests', detail: 'Rate limiting is active.' }, { code: 500, label: 'Internal Server Error', detail: 'The server encountered an unexpected condition.' }]; const [query, setQuery] = useState(''); const filtered = statuses.filter((status) => `${status.code} ${status.label} ${status.detail}`.toLowerCase().includes(query.toLowerCase())); return <div className="reference-tool"><input value={query} onChange={(event) => setQuery(event.target.value)} placeholder="Search status codes..." aria-label="Search HTTP statuses" />{filtered.map((status) => <div className="reference-row" key={status.code}><strong>{status.code}</strong><span><b>{status.label}</b><small>{status.detail}</small></span></div>)}</div> }
+function HttpStatusTool() { const statuses = [
+  { code: 100, label: 'Continue', detail: 'The server received the request headers and the client may continue.' },
+  { code: 101, label: 'Switching Protocols', detail: 'The server is switching protocols as requested.' },
+  { code: 200, label: 'OK', detail: 'The request succeeded.' },
+  { code: 201, label: 'Created', detail: 'The request succeeded and created a resource.' },
+  { code: 202, label: 'Accepted', detail: 'The request was accepted for processing, but processing may not be complete.' },
+  { code: 204, label: 'No Content', detail: 'The request succeeded and there is no response content.' },
+  { code: 206, label: 'Partial Content', detail: 'The server is returning the requested range of a resource.' },
+  { code: 301, label: 'Moved Permanently', detail: 'The resource has a new permanent URL.' },
+  { code: 302, label: 'Found', detail: 'The resource is temporarily available at another URL.' },
+  { code: 304, label: 'Not Modified', detail: 'The cached representation can be reused.' },
+  { code: 307, label: 'Temporary Redirect', detail: 'The request should be repeated at another URL without changing its method.' },
+  { code: 308, label: 'Permanent Redirect', detail: 'The resource has a permanent URL and the request method is preserved.' },
+  { code: 400, label: 'Bad Request', detail: 'The server could not understand the request.' },
+  { code: 401, label: 'Unauthorized', detail: 'Valid authentication credentials are required.' },
+  { code: 403, label: 'Forbidden', detail: 'The server understood the request but refuses to fulfill it.' },
+  { code: 404, label: 'Not Found', detail: 'The requested resource could not be found.' },
+  { code: 405, label: 'Method Not Allowed', detail: 'The request method is not supported for this resource.' },
+  { code: 408, label: 'Request Timeout', detail: 'The server did not receive a complete request in time.' },
+  { code: 409, label: 'Conflict', detail: 'The request conflicts with the current state of the resource.' },
+  { code: 410, label: 'Gone', detail: 'The resource is no longer available and this is likely permanent.' },
+  { code: 413, label: 'Content Too Large', detail: 'The request content exceeds the server limit.' },
+  { code: 415, label: 'Unsupported Media Type', detail: 'The request content format is not supported.' },
+  { code: 422, label: 'Unprocessable Content', detail: 'The content type and syntax are understood, but the instructions cannot be processed.' },
+  { code: 429, label: 'Too Many Requests', detail: 'The client has sent too many requests in a given amount of time.' },
+  { code: 500, label: 'Internal Server Error', detail: 'The server encountered an unexpected condition.' },
+  { code: 501, label: 'Not Implemented', detail: 'The server does not support the functionality required to fulfill the request.' },
+  { code: 502, label: 'Bad Gateway', detail: 'A gateway received an invalid response from an upstream server.' },
+  { code: 503, label: 'Service Unavailable', detail: 'The server is temporarily unable to handle the request.' },
+  { code: 504, label: 'Gateway Timeout', detail: 'A gateway did not receive a timely response from an upstream server.' },
+] const [query, setQuery] = useState(''); const filtered = statuses.filter((status) => `${status.code} ${status.label} ${status.detail}`.toLowerCase().includes(query.toLowerCase())); return <div className="reference-tool"><input value={query} onChange={(event) => setQuery(event.target.value)} placeholder="Search status codes..." aria-label="Search HTTP statuses" />{filtered.map((status) => <div className="reference-row" key={status.code}><strong>{status.code}</strong><span><b>{status.label}</b><small>{status.detail}</small></span></div>)}</div> }
 function CronTool() { const [input, setInput] = useState('*/15 * * * *'); let output = ''; try { output = `Schedule\n${explainCron(input)}\n\nNext runs\n${nextCronRuns(input).join('\n')}` } catch (error) { output = `Error: ${error instanceof Error ? error.message : 'Invalid cron expression'}` }; return <ToolShell output={output} onReset={() => setInput('')} onCopy={() => navigator.clipboard.writeText(output)}><textarea value={input} onChange={(event) => setInput(event.target.value)} aria-label="Cron expression" /></ToolShell> }
