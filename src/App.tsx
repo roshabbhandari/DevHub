@@ -27,7 +27,7 @@ function App() {
     return () => window.removeEventListener('popstate', handlePopState)
   }, [])
   useEffect(() => {
-    const handleKeyDown = (event: KeyboardEvent) => { if (event.key === 'Escape') setMobileMenuOpen(false) }
+    const handleKeyDown = (event: KeyboardEvent) => { if (event.key === 'Escape') setMobileMenuOpen(false); if ((event.metaKey || event.ctrlKey) && event.key.toLowerCase() === 'k') { event.preventDefault(); document.querySelector<HTMLInputElement>('.search input')?.focus() } }
     window.addEventListener('keydown', handleKeyDown)
     return () => window.removeEventListener('keydown', handleKeyDown)
   }, [])
@@ -119,21 +119,88 @@ function App() {
     <button className="mobile-menu-button" aria-label="Open navigation" aria-expanded={mobileMenuOpen} onClick={() => setMobileMenuOpen(true)}>☰</button><div className={`mobile-overlay ${mobileMenuOpen ? 'visible' : ''}`} onClick={() => setMobileMenuOpen(false)} /><Sidebar route={route} favorites={favorites.length} onOpen={open} isOpen={mobileMenuOpen} onClose={() => setMobileMenuOpen(false)} />
     <main className="main-content">
       <header className="topbar"><div className="breadcrumbs"><span>Workspace</span><span>/</span><b>{activeTool?.name ?? (route.kind === 'dashboard' ? 'Dashboard' : route.kind)}</b></div><div className="top-actions"><label className="search"><span>⌕</span><input value={query} onChange={(event) => setQuery(event.target.value)} placeholder="Search tools..." /><button className="icon-button" aria-label="Toggle theme" onClick={() => setTheme(theme === 'dark' ? 'light' : 'dark')}>{theme === 'dark' ? '☼' : '☾'}</button><button className="help-button" aria-label="Contact DevHub" onClick={() => open('/contact')}>?</button><div className="profile" aria-label="DevHub">D</div></div></header>
-      {activeTool ? <ToolView tool={activeTool} onBack={() => open('/')} /> : dashboard ? <Dashboard tools={visibleTools} recent={recent} favorites={favorites} onOpen={open} onFavorite={toggleFavorite} query={query} /> : route.kind === 'history' ? <History recent={recent} onOpen={open} /> : route.kind === 'settings' ? <Settings theme={theme} setTheme={setTheme} /> : route.kind === 'info' ? <InfoPage page={route.page} /> : <NotFound onHome={() => open('/')} />}
+      {activeTool ? <ToolView tool={activeTool} onBack={() => open('/')} /> : dashboard ? <Dashboard tools={visibleTools} recent={recent} favorites={favorites} onOpen={open} onFavorite={toggleFavorite} query={query} pageMode={route.kind === 'favorites' ? 'favorites' : route.kind === 'category' ? 'category' : 'dashboard'} /> : route.kind === 'history' ? <History recent={recent} onOpen={open} /> : route.kind === 'settings' ? <Settings theme={theme} setTheme={setTheme} /> : route.kind === 'info' ? <InfoPage page={route.page} /> : <NotFound onHome={() => open('/')} />}
       <Footer onOpen={open} />
     </main>
   </div>
 }
 
 function Sidebar({ route, favorites, onOpen, isOpen, onClose }: { route: AppRoute; favorites: number; onOpen: (path: string) => void; isOpen: boolean; onClose: () => void }) {
-  return <aside className={`sidebar ${isOpen ? 'mobile-open' : ''}`} aria-label="Application navigation"><div className="brand"><span className="brand-mark">D</span><span>DevHub</span><span className="beta">BETA</span><button className="mobile-close" aria-label="Close navigation" onClick={onClose}>×</button></div><div className="workspace-switcher"><span className="avatar">D</span><span><b>Browser workspace</b><small>No account required</small></span></div><nav aria-label="Primary navigation"><p className="nav-label">Workspace</p><NavButton icon="⌂" label="Dashboard" active={route.kind === 'dashboard'} onClick={() => onOpen('/')} /><NavButton icon="⌕" label="Discover tools" active={route.kind === 'category' && !route.category} onClick={() => onOpen('/')} /><NavButton icon="▣" label="Code Studio" active={route.kind === 'category' && route.category === 'Code Engineering'} onClick={() => onOpen('/category/Code%20Engineering')} /><NavButton icon="⌁" label="API Workspace" active={route.kind === 'category' && route.category === 'API Workspace'} onClick={() => onOpen('/category/API%20Workspace')} /><p className="nav-label">Library</p><NavButton icon="★" label="Favorites" active={route.kind === 'favorites'} onClick={() => onOpen('/favorites')} count={favorites} /><NavButton icon="◷" label="History" active={route.kind === 'history'} onClick={() => onOpen('/history')} /><NavButton icon="ⓘ" label="About DevHub" active={route.kind === 'info' && route.page === 'about'} onClick={() => onOpen('/about')} /></nav><div className="sidebar-bottom"><NavButton icon="⚙" label="Settings" active={route.kind === 'settings'} onClick={() => onOpen('/settings')} /><div className="sidebar-note"><b>Local-first tools</b><p>Everyday transformations run in your browser. No DevHub account is required.</p></div><small className="version">DevHub v0.2.0 · Local mode</small></div></aside>
+  return <aside className={`sidebar ${isOpen ? 'mobile-open' : ''}`} aria-label="Application navigation"><div className="brand"><span className="brand-mark">D</span><span>DevHub</span><button className="mobile-close" aria-label="Close navigation" onClick={onClose}>×</button></div><div className="workspace-switcher"><span className="avatar">D</span><span><b>Browser workspace</b><small>No account required</small></span></div><nav aria-label="Primary navigation"><p className="nav-label">Workspace</p><NavButton icon="⌂" label="Dashboard" active={route.kind === 'dashboard'} onClick={() => onOpen('/')} /><NavButton icon="⌕" label="Discover tools" active={route.kind === 'category' && !route.category} onClick={() => onOpen('/')} /><NavButton icon="▣" label="Code Studio" active={route.kind === 'category' && route.category === 'Code Engineering'} onClick={() => onOpen('/category/Code%20Engineering')} /><NavButton icon="⌁" label="API Workspace" active={route.kind === 'category' && route.category === 'API Workspace'} onClick={() => onOpen('/category/API%20Workspace')} /><p className="nav-label">Library</p><NavButton icon="★" label="Favorites" active={route.kind === 'favorites'} onClick={() => onOpen('/favorites')} count={favorites} /><NavButton icon="◷" label="History" active={route.kind === 'history'} onClick={() => onOpen('/history')} /><NavButton icon="ⓘ" label="About DevHub" active={route.kind === 'info' && route.page === 'about'} onClick={() => onOpen('/about')} /></nav><div className="sidebar-bottom"><NavButton icon="⚙" label="Settings" active={route.kind === 'settings'} onClick={() => onOpen('/settings')} /><div className="sidebar-note"><b>Local-first tools</b><p>Everyday transformations run in your browser. No DevHub account is required.</p></div><small className="version">DevHub v0.2.0 · Local mode</small></div></aside>
 }
 
 function NavButton({ icon, label, active, onClick, count }: { icon: string; label: string; active: boolean; onClick: () => void; count?: number }) { return <button className={`nav-button ${active ? 'active' : ''}`} onClick={onClick}><span>{icon}</span>{label}{count ? <em>{count}</em> : null}</button> }
 
-function Dashboard({ tools: visibleTools, recent, favorites, onOpen, onFavorite, query }: { tools: Tool[]; recent: string[]; favorites: string[]; onOpen: (path: string, toolId?: string) => void; onFavorite: (id: string) => void; query: string }) {
+function Dashboard({ tools: visibleTools, recent, favorites, onOpen, onFavorite, query, pageMode }: { tools: Tool[]; recent: string[]; favorites: string[]; onOpen: (path: string, toolId?: string) => void; onFavorite: (id: string) => void; query: string; pageMode: 'dashboard' | 'favorites' | 'category' }) {
   const recentTools = recent.map((id) => tools.find((tool) => tool.id === id)).filter(Boolean) as Tool[]
-  return <div className="page"><section className="welcome"><div><p className="eyebrow">{new Date().toLocaleDateString(undefined, { weekday: 'long', month: 'long', day: 'numeric', year: 'numeric' })}</p><h1>Welcome to DevHub <span>✦</span></h1><p className="subtitle">A practical workspace for everyday development tasks.</p></div><button className="primary-button" onClick={() => document.querySelector<HTMLInputElement>('.search input')?.focus()}>⌕ <span>Find a tool</span><kbd>⌘ K</kbd></button></section><AdSlot slot={import.meta.env.VITE_ADSENSE_HEADER_SLOT as string | undefined} /><section className="metrics"><Metric icon="⌘" label="Available tools" value={`${tools.length}`} helper="across six categories" /><Metric icon="★" label="Favorites" value={`${favorites.length}`} helper="saved in this browser" /><Metric icon="◷" label="Recently used" value={`${recent.length}`} helper="your recent tools" /><Metric icon="◈" label="Processing" value="Browser" helper="no DevHub account required" /></section>{query ? <ToolGrid title={`Search results for “${query}”`} tools={visibleTools} onOpen={onOpen} onFavorite={onFavorite} favorites={favorites} /> : <><section className="section-heading"><div><h2>{visibleTools.length === tools.length ? 'All developer tools' : 'Matching tools'}</h2><p>Open a tool to see instructions, examples, and practical limitations.</p></div></section><ToolGrid title="" tools={visibleTools} onOpen={onOpen} onFavorite={onFavorite} favorites={favorites} />{recentTools.length > 0 && <><section className="section-heading"><div><h2>Continue working</h2><p>Pick up where you left off.</p></div></section><div className="recent-row">{recentTools.map((tool) => <button className="recent-card" key={tool.id} onClick={() => onOpen(tool.path, tool.id)}><span className="tool-icon small">{tool.icon}</span><span><b>{tool.name}</b><small>{tool.category}</small></span><span className="arrow">→</span></button>)}</div></>}<section className="section-heading category-heading"><div><h2>Explore by category</h2><p>Find the right tool for every engineering task.</p></div></section><div className="category-grid">{categories.map((category, index) => <button key={category} onClick={() => onOpen(`/category/${encodeURIComponent(category)}`)}><span className={`category-icon c${index}`}>{['⌘', '◇', '↗', '⊞', '♢', '⌁'][index]}</span><span><b>{category}</b><small>{tools.filter((tool) => tool.category === category).length} tools</small></span><span className="arrow">→</span></button>)}</div><HomeContent /></>}</div>
+  const sectionTitle = pageMode === 'favorites' ? 'Saved tools' : pageMode === 'category' ? 'Tools in this category' : 'All developer tools'
+
+  return (
+    <div className="page">
+      {pageMode === 'dashboard' ? (
+        <section className="welcome">
+          <div>
+            <p className="eyebrow">{new Date().toLocaleDateString(undefined, { weekday: 'long', month: 'long', day: 'numeric', year: 'numeric' })}</p>
+            <h1>Welcome to DevHub <span>✦</span></h1>
+            <p className="subtitle">A practical workspace for everyday development tasks.</p>
+          </div>
+          <button className="primary-button" onClick={() => document.querySelector<HTMLInputElement>('.search input')?.focus()}>⌕ <span>Find a tool</span><kbd>⌘ K</kbd></button>
+        </section>
+      ) : (
+        <section className="welcome">
+          <div>
+            <p className="eyebrow">{pageMode === 'favorites' ? 'YOUR LIBRARY' : 'TOOL CATEGORY'}</p>
+            <h1>{pageMode === 'favorites' ? 'Saved tools' : 'Explore developer tools'}</h1>
+            <p className="subtitle">{pageMode === 'favorites' ? 'Your favorites are stored locally in this browser.' : 'Choose a tool to open its editor, guide, and examples.'}</p>
+          </div>
+        </section>
+      )}
+
+      {pageMode === 'dashboard' && <AdSlot slot={import.meta.env.VITE_ADSENSE_HEADER_SLOT as string | undefined} />}
+
+      {pageMode === 'dashboard' && (
+        <section className="metrics">
+          <Metric icon="⌘" label="Available tools" value={`${tools.length}`} helper="across six categories" />
+          <Metric icon="★" label="Favorites" value={`${favorites.length}`} helper="saved in this browser" />
+          <Metric icon="◷" label="Recently used" value={`${recent.length}`} helper="your recent tools" />
+          <Metric icon="◈" label="Processing" value="Browser" helper="no DevHub account required" />
+        </section>
+      )}
+
+      {query ? (
+        <ToolGrid title={`Search results for “${query}”`} tools={visibleTools} onOpen={onOpen} onFavorite={onFavorite} favorites={favorites} />
+      ) : (
+        <>
+          <section className="section-heading">
+            <div>
+              <h2>{sectionTitle}</h2>
+              <p>{pageMode === 'favorites' ? 'Open a saved tool or remove it from your favorites.' : 'Open a tool to see instructions, examples, and practical limitations.'}</p>
+            </div>
+          </section>
+          <ToolGrid title="" tools={visibleTools} onOpen={onOpen} onFavorite={onFavorite} favorites={favorites} />
+
+          {pageMode === 'dashboard' && recentTools.length > 0 && (
+            <>
+              <section className="section-heading"><div><h2>Continue working</h2><p>Pick up where you left off.</p></div></section>
+              <div className="recent-row">
+                {recentTools.map((tool) => <button className="recent-card" key={tool.id} onClick={() => onOpen(tool.path, tool.id)}><span className="tool-icon small">{tool.icon}</span><span><b>{tool.name}</b><small>{tool.category}</small></span><span className="arrow">→</span></button>)}
+              </div>
+            </>
+          )}
+
+          {pageMode !== 'favorites' && (
+            <>
+              <section className="section-heading category-heading"><div><h2>Explore by category</h2><p>Find the right tool for every engineering task.</p></div></section>
+              <div className="category-grid">
+                {categories.map((category, index) => <button key={category} onClick={() => onOpen(`/category/${encodeURIComponent(category)}`)}><span className={`category-icon c${index}`}>{['⌘', '◇', '↗', '⊞', '♢', '⌁'][index]}</span><span><b>{category}</b><small>{tools.filter((tool) => tool.category === category).length} tools</small></span><span className="arrow">→</span></button>)}
+              </div>
+            </>
+          )}
+          {pageMode === 'dashboard' && <HomeContent />}
+        </>
+      )}
+    </div>
+  )
 }
 
 function HomeContent() {
